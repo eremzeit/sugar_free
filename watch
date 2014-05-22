@@ -1,1 +1,1 @@
-coffee --watch --output ./build --compile ./src/
+coffee --watch  --join ./build/sugar_free.js  --compile ./src/ 

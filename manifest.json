@@ -13,7 +13,11 @@
     {
       "matches": ["*://*/*"],
       "css": ["css/styles.css"],
-      "js": ["lib/underscore.js", "lib/jquery.js", "build/sugar_free.js"]
+      "js": [
+        "lib/underscore.js", 
+        "lib/jquery.js", 
+        "build/sugar_free.js"
+      ]
     }
   ]
 }

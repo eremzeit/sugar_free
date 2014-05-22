@@ -1,71 +1,34 @@
-fade_specs = [
-  {
-    site: {
-      protocol: '*'
-      host: 'www.bbc.com'
-      path: '*'
-    }
-    action_list: [
-      {
-        element_match: {
-          class:'page-title'
-        }
-        type: 'hide'
-      }
-      
-    ]
-    
-  }
-]
+ElementMutator
+console.log('LOADING SUGAR FREE')
 
-
-
-class SpecsExecutor
-  constructor: (@fade_specs) ->
+class InjunctionExecutor
+  constructor: (@injunctions) ->
      
   execute: ->
-    console.log("Attempting to run SpecsExecutor")
+    for injunction in @injunctions
+      if not PageJudge.isPageMatch(injunction.page_matcher)
+        console.log("Page is not a match: #{injunction.page_matcher}")
+        continue
 
-    for spec in @fade_specs
-      console.log ("Trying spec: #{spec}")
-      if @doesMatchSite(spec.site)
-        console.log ("Executing spec: #{spec}")
-        for action in spec.action_list
-          $matchedElements = @match(action.element_match)
-          @doAction($matchedElements, action.type, {})
+      for action in injunction.action_list
+        for matcher in action.matchers
+          #$matchedElements = ElementJudge.match(matcher)
+          #ElementMutator.do($matchedElements, action.type, {})
+          if matcher.css?
+            ElementMutator.hideElementByCSS(matcher.css)
 
-  doesMatchSite: (site_matcher) ->
-    console.log(site_matcher)
-    console.log(location)
-    return true
-    !site_matcher.host == location.host
 
-  match: (elementMatcher) ->
-    return $('*').not('*') if _.isEmpty(elementMatcher)
-
-    console.log("element_match:")
-    console.log(elementMatcher)
-    matched = $('*')
-    for type,value of elementMatcher
-      console.log('aeou')
-      fn = this["_match_#{type}"]
-      console.log(fn)
-      matched = fn(matched, value)
-    matched
-  
-  _match_id: ($matched, id) ->
-    $matched.filter('#' + id)
-  
-  _match_class: ($matched, cls) ->
-    $matched.filter('.' + cls)
-
-  doAction: ($elem, action_type, options) ->
-    @_hide_element($elem)
+  addInsertionListener: (cssQuery)->
     
-  _hide_element: ($elem) ->
-    $elem.css('background-color', 'red')
+animationCallback = ->
+  if event.animationName == "nodeInserted"
+    # This is the debug for knowing our listener worked!
+    # event.target is the new node!
+    console.warn("Another node has been inserted! ", event, event.target)
 
+#document.addEventListener("animationstart", animationCallback, false); # standard + firefox
+#document.addEventListener("MSAnimationStart", animationCallback, false); # IE
+#document.addEventListener("webkitAnimationStart", animationCallback, false); # Chrome + Safari
 
-console.log("STARTED!")
-e = new SpecsExecutor(fade_specs)
+e = new InjunctionExecutor(window.sugar_free.sample_injunctions)
 e.execute()
